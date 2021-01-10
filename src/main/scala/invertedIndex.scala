@@ -20,7 +20,14 @@ object invertedIndex {
 
         val wordGroups = wordsAsIndex.groupByKey.sortByKey(ascending = true) // aggregate (filename, count) for each key: group
 
-        val examples = wordGroups.take(50)
+        val finalInvertedIndex = wordGroups.mapValues { iterable =>
+            val vect = iterable.toVector.sortBy {file_count_tup =>
+                (-file_count_tup._2, file_count_tup._1)
+            }
+            vect.mkString(",")
+        }
+
+        val examples = finalInvertedIndex.take(10)
         examples.foreach(println)
     }
 }
