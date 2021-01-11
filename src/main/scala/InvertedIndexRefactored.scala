@@ -3,7 +3,7 @@ import org.apache.spark.sql.SparkSession
 
 object InvertedIndexRefactored {
 
-    val stopWords: Set[String] = Set("to", "me", "", "a", "and", "it", "the")
+    val stopWords: Set[String] = Set("to", "me", "", "a", "and", "he", "it", "not", "the","my", "but", "will", "be", "I", "you", "in", "is", "are", "with", "for", "that", "of", "his", "her", "so", "s", "your", "sir", "and", "this", "as", " and", "have", "him", "what", "thou", "no", "if", "do", "by", "she", "d", "we", "our", "thee", "shall", "sir")
 
     def keep(word: String): Boolean = !stopWords.contains(word)
 
@@ -19,7 +19,7 @@ object InvertedIndexRefactored {
                     val words = contents.split("""\W+""").filter(word => word.size > 0)
                         .filter(keep)
                     val filename = location.split("/").last
-                    words.map(word => ((word, filename), 1))
+                    words.map(word => ((word.toLowerCase(), filename), 1))
                 }
             }
             .reduceByKey((acc, num) => acc + num)
@@ -41,7 +41,7 @@ object InvertedIndexRefactored {
 
         val top10Words = spark.sql(
     """
-      |SELECT word, total_count, locations[0] AS top_location, counts[0]
+      |SELECT word, total_count, locations[0] AS top_location, counts[0] AS count
       |FROM inverted_index
       |ORDER BY total_count DESC
       |LIMIT 10
