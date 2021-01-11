@@ -2,8 +2,9 @@
 
 A simple inverted-index written in Scala & Spark RDD API.
 Any text file found in ```source_files``` will be read and transformed by Spark to show the following result:
+*each record has "word" as the key and shows the total count from all text files, file that has the most count for the word and the count in that file.
+
 ```
-each record has "word" as the key and shows the total count from all text files, file that has the most count for the word and the count in that file.
 +----+-----------+-------------------+-----+
 |word|total_count|       top_location|count|
 +----+-----------+-------------------+-----+
