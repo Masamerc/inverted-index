@@ -1,2 +1,6 @@
 .metals
 .vscode
+.bsp
+.bloop
+target/
+src/main/scala/testScript.scala

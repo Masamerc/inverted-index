@@ -3,11 +3,9 @@ import org.apache.spark.sql.SparkSession
 
 object InvertedIndexRefactored {
 
-    val stopWords: Array[String] = Array("to", "me")
+    val stopWords: Set[String] = Set("to", "me", "", "a", "and", "it", "the")
 
-    def keep(word: String): Boolean = {
-        !stopWords.contains(word)
-    }
+    def keep(word: String): Boolean = !stopWords.contains(word)
 
     def main(args: Array[String]): Unit = {
         val sc = new SparkContext("local[*]", "invertedIndexRefactored")
@@ -15,7 +13,7 @@ object InvertedIndexRefactored {
             .appName("invertedIndexRefactored")
             .getOrCreate()
 
-        val invertedIndex = sc.wholeTextFiles("./shakespeare")
+        val invertedIndex = sc.wholeTextFiles("./source_files")
             .flatMap {
                 case (location, contents) => {
                     val words = contents.split("""\W+""").filter(word => word.size > 0)
@@ -41,21 +39,15 @@ object InvertedIndexRefactored {
         iiDF.cache
         iiDF.createOrReplaceTempView("inverted_index") // now sql queries can be run
 
-//        val examples = invertedIndex.take(10)
-//        examples.foreach(println)
-
-        val topLocationsLoveHate = spark.sql(
+        val top10Words = spark.sql(
     """
-      |WITH relevant_words AS (
       |SELECT word, total_count, locations[0] AS top_location, counts[0]
       |FROM inverted_index
-      |WHERE (word LIKE '%love%') OR (word LIKE '%hate%')
-      |)
-      |SELECT * FROM relevant_words
-      |WHERE word NOT IN ('glove', 'gloves', 'whate', 'whatever', 'Whatever')
+      |ORDER BY total_count DESC
+      |LIMIT 10
       |""".stripMargin)
 
-        topLocationsLoveHate.show()
+        top10Words.show()
 
     }
 }

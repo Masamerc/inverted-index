@@ -20,7 +20,4 @@ object testScript extends App {
         case (name, age) => (age, name)
     }
     dataInverted.foreach(println)
-
-
-
 }
